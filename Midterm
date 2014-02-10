@@ -1,0 +1,296 @@
+//"Song of Storms" AKA "Midterm project attempt #3" AKA "This nearly killed me"
+//By Saffron Aurora
+//For Kate Hartman's Physical Computing class, DIGF 2B03
+//Code referenced from the Arduino examples "Simple keyboard using the tone() function",
+//as well as Tanner Ewing's "How to make an Arduino Combination Door Lock" (http://www.electronics123.com/s.nl/it.I/id.30/.f)
+//'Song of Storms" piezo notes edited from XdemonX456's original code (http://forum.arduino.cc/index.php?topic=56637.0)
+
+//Constant 
+const int button1Pin = 0;
+const int button2Pin = 1;
+const int button3Pin = 2;
+const int button4Pin = 3;
+const int button5Pin = 4;
+const int speakerPin = 8;
+const int ledPin = 13;
+#include "pitches.h"
+
+int buttonState1 = 0;
+int buttonState2 = 0;
+int buttonState3 = 0;
+int buttonState4 = 0;
+int buttonState5 = 0;
+//int buttonState = 0;
+int noteD = NOTE_D5;
+int noteB = NOTE_B4;
+int noteA = NOTE_A4;
+int noteF = NOTE_F4;
+int lowD = NOTE_D4;
+int val = 0; 
+int sensorValue = 0;
+int combCheckSum = 0;
+
+//Ocarina notes
+int notes[] = {
+  NOTE_D5, NOTE_B4,NOTE_A4,NOTE_F4, NOTE_D4 };
+
+void setup() {
+  
+  pinMode(speakerPin, OUTPUT);
+  pinMode(button1Pin, INPUT);
+  pinMode(button2Pin, INPUT);
+  pinMode(button3Pin, INPUT);
+  pinMode(button4Pin, INPUT);
+  pinMode(button5Pin, INPUT);
+  Serial.begin(9600);
+  
+  
+}
+
+void loop() {
+  
+
+    // read the state of the pushbutton value:
+  buttonState1 = analogRead(button1Pin);
+  buttonState2 = analogRead(button2Pin);
+  buttonState3 = analogRead(button3Pin);
+  buttonState4 = analogRead(button4Pin);
+  buttonState5 = analogRead(button5Pin);
+
+//  buttonState = analogRead(button1Pin);
+//  buttonState = analogRead(button2Pin);
+//  buttonState = analogRead(button3Pin);
+//  buttonState = analogRead(button4Pin);
+//  buttonState = analogRead(button5Pin);
+
+  // check if the pushbutton is pressed.
+  // if it is, the buttonState is HIGH:
+//  if (buttonState1 == 1023) {     
+   // turn Speaker on:    
+//    digitalWrite(speakerPin, HIGH);  
+//    tone(8, noteD);
+//  } 
+//  else {
+//    // turn Speaker off:
+////    digitalWrite(speakerPin, LOW);
+//   noTone; 
+//  }
+ 
+ /////////Combination Lock Combo///////
+ if (buttonState5 == 1023) {     
+    combCheckSum = 1000;
+  } 
+
+
+  if (buttonState4 == 1023) {
+   if (buttonState5 >= 0) {
+     if (combCheckSum == 1000) {
+       combCheckSum = 1200;
+     }
+   }
+   else {
+   combCheckSum = 0;
+   } 
+}
+  
+if (buttonState1 == 1023) {
+   if (buttonState4 >= 0) {
+      if (combCheckSum == 1200) {
+         combCheckSum = 1230;
+    }  
+   } 
+   else {
+   combCheckSum = 0;
+   } 
+}
+
+//Second Part  
+//  
+//  if (buttonState5 == 1023) {
+//   if (buttonState1 >= 0) {
+//     if (combCheckSum == 1230) {
+//       combCheckSum = 1234;
+//     }
+//   }
+////   else {
+////   combCheckSum = 0;
+////   } 
+//}
+//  
+//if (buttonState4 == 1023) {
+//   if (buttonState5 >= 0) {
+//      if (combCheckSum == 1234) {
+//         combCheckSum = 2234;
+//    }  
+//   } 
+//   else {
+//   combCheckSum = 0;
+//   } 
+//}
+//
+//if (buttonState1 == 1023) {
+//   if (buttonState4 >= 0) {
+//      if (combCheckSum == 1234) {
+//         combCheckSum = 2334;
+//    }  
+//   } 
+//   else {
+//   combCheckSum = 0;
+//   } 
+//}
+ 
+
+if (combCheckSum == 1230) {
+
+  combCheckSum = 0;
+  song();
+  
+}
+////////Combo End//////////
+  
+  //Code from FSR example to make sound work, not correct way of doing it
+  for (int button = 0; button < 5; button++) {
+    // get a sensor reading:
+    int sensorReading = analogRead(button);
+
+    if (sensorReading > 10) {
+      // play the note corresponding to this button:
+      tone(8, notes[button], 20);
+    } 
+  }
+
+  //Debugging
+//  val = analogRead(button1Pin);    // read the input pin
+//  val = analogRead(button2Pin); 
+//  val = analogRead(button3Pin); 
+//  val = analogRead(button4Pin); 
+//  val = analogRead(button5Pin); 
+//    val = digitalRead(speakerPin);
+    
+  Serial.println(combCheckSum);             // debug value 
+  
+  
+}
+
+//Tanner Ewings 'Song of Storms' code
+void beep (unsigned char speakerPin, int frequencyInHertz, long timeInMilliseconds)  //code for working out the rate at which each note plays and the frequency.
+{
+  digitalWrite(ledPin, HIGH);
+  int x;      
+  long delayAmount = (long)(1000000/frequencyInHertz);
+  long loopTime = (long)((timeInMilliseconds*1000)/(delayAmount*2));
+  for (x=0;x<loopTime;x++)    
+  {    
+    digitalWrite(speakerPin,HIGH);
+    delayMicroseconds(delayAmount);
+    digitalWrite(speakerPin,LOW);
+    delayMicroseconds(delayAmount);
+  }    
+  digitalWrite(ledPin, LOW);
+  delay(20);
+}        
+
+//Edited from Tanner Ewings code 
+void song()  //here is where all the notes for the song are played.
+{        
+  beep(speakerPin, NOTE_D5, 100);  //   beep( -PIN OF SPEAKER-, -THE NOTE WANTING TO BE PLAYED-, -DURATION OF THE NOTE IN MILISECONDS- )
+  delay(40);
+  beep(speakerPin, NOTE_F5, 100); 
+  delay(30);
+  beep(speakerPin, NOTE_D6, 300); 
+  delay(400);
+  
+  beep(speakerPin, NOTE_D5, 100); 
+  delay(40);
+  beep(speakerPin, NOTE_F5, 100); 
+  delay(30);
+  beep(speakerPin, NOTE_D6, 300);
+  delay(400);
+  
+  beep(speakerPin, NOTE_E6, 300); 
+  delay(200);
+  beep(speakerPin, NOTE_F6, 100); 
+  delay(100);
+  beep(speakerPin, NOTE_E6, 80); 
+  delay(50);
+  beep(speakerPin, NOTE_F6, 100); 
+  delay(50);
+  beep(speakerPin, NOTE_E6, 100); 
+  delay(50);
+  beep(speakerPin, NOTE_C6, 100); 
+  delay(80);
+  beep(speakerPin, NOTE_A5, 300); 
+  delay(400);
+  
+  beep(speakerPin, NOTE_A5, 200); 
+  delay(80);
+  beep(speakerPin, NOTE_D5, 200); 
+  delay(100);
+  beep(speakerPin, NOTE_F5, 100); 
+  delay(80);
+  beep(speakerPin, NOTE_G5, 100); 
+  delay(80);
+  beep(speakerPin, NOTE_A5, 300); 
+  delay(500);
+  
+  beep(speakerPin, NOTE_A5, 200); 
+  delay(80);
+  beep(speakerPin, NOTE_D5, 200); 
+  delay(100);
+  beep(speakerPin, NOTE_F5, 100); 
+  delay(80);
+  beep(speakerPin, NOTE_G5, 100); 
+  delay(80);
+  beep(speakerPin, NOTE_E5, 300); 
+  delay(500);
+  
+  
+  
+  beep(speakerPin, NOTE_D5, 80); 
+  delay(50);
+  beep(speakerPin, NOTE_F5, 80); 
+  delay(40);
+  beep(speakerPin, NOTE_D6, 400); 
+  delay(350);
+  
+  beep(speakerPin, NOTE_D5, 80); 
+  delay(50);
+  beep(speakerPin, NOTE_F5, 80); 
+  delay(40);
+  beep(speakerPin, NOTE_D6, 400);
+  delay(350);
+  
+  beep(speakerPin, NOTE_E6, 300); 
+  delay(200);
+  beep(speakerPin, NOTE_F6, 100); 
+  delay(100);
+  beep(speakerPin, NOTE_E6, 80); 
+  delay(80);
+  beep(speakerPin, NOTE_F6, 100); 
+  delay(40);
+  beep(speakerPin, NOTE_E6, 100); 
+  delay(50);
+  beep(speakerPin, NOTE_C6, 100); 
+  delay(80);
+  beep(speakerPin, NOTE_A5, 300); 
+  delay(300);
+  
+  beep(speakerPin, NOTE_A5, 200); 
+  delay(100);
+  beep(speakerPin, NOTE_D5, 200); 
+  delay(80);
+  beep(speakerPin, NOTE_F5, 100); 
+  delay(100);
+  beep(speakerPin, NOTE_G5, 100); 
+  delay(80);
+  beep(speakerPin, NOTE_A5, 300);
+  delay(200);
+  beep(speakerPin, NOTE_A5, 300);
+  delay(50);
+  beep(speakerPin, NOTE_D5, 500);
+  delay(2000);
+  
+  noTone(speakerPin);
+}
+
+
